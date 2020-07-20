@@ -15,11 +15,20 @@ struct ContentView: View {
     @State var selectedObject: FileModel?
     
     var body: some View {
-        ItemsListView(sections: viewModel.sections, selectedObject: $selectedObject)
-            .onDrop(of: [ListViewModel.dropFileType], isTargeted: nil) { itemsProviders -> Bool in
-                return self.viewModel.handleDrop(itemsProviders: itemsProviders)
+        NavigationView {
+            ItemsListView(sections: viewModel.sections, selectedObject: $selectedObject)
+                .onDrop(of: [ListViewModel.dropFileType], isTargeted: nil) { itemsProviders -> Bool in
+                    return self.viewModel.handleDrop(itemsProviders: itemsProviders)
+            }
+            .onReceive(notificationCenter.publisher(for: .add)) { _ in self.handleMenuAdd() }
+            
+            Button(action: {
+                self.viewModel.preview(items: [])
+            }) {
+                Text("Preview")
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
-        .onReceive(notificationCenter.publisher(for: .add)) { _ in self.handleMenuAdd() }
     }
     
     private func handleMenuAdd() {

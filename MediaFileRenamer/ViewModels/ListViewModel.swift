@@ -19,7 +19,7 @@ class ListViewModel: ObservableObject {
     private var addCancellable: AnyCancellable?
     
     var sections: [ArtistSection] {
-        return Dictionary(grouping: objects, by: \.mp3Info.artist)
+        return Dictionary(grouping: objects, by: \.mediaInfo.artist)
             .map { ArtistSection(id: $0.key ?? Self.unknownArtistSection, items: $0.value) }
     }
     
@@ -42,6 +42,10 @@ class ListViewModel: ObservableObject {
                 if files.isEmpty { return }
                 self.objects.formUnion(files)
             })
+    }
+    
+    func preview(items: [FileModel]) {
+        
     }
     
     private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileModel], Never> {
