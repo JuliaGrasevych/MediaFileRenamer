@@ -9,21 +9,33 @@
 import SwiftUI
 
 struct MediaFileView: View {
-    var file: FileModel
+    @ObservedObject var file: FileModel
+    @Binding var selectedItems: Set<FileModel>
+    var isSelected: Bool {
+        selectedItems.contains(file)
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text(file.mediaInfo.title ?? "No title".uppercased())
             Text("Filename: \(file.initialFilename())")
             file.proposedFilename().map { proposedFilename in
                 HStack {
-                    Image("arrow.turn.down.right")
+                    Text("􀄵")
                     Text(proposedFilename)
                 }
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.6))
+        .background(Color.gray.opacity(isSelected ? 1.0 : 0.4))
         .cornerRadius(6)
+        .onTapGesture {
+            if self.isSelected {
+                self.selectedItems.remove(self.file)
+            } else {
+                self.selectedItems.insert(self.file)
+            }
+        }
     }
 }
 

@@ -25,7 +25,11 @@ class FileModel: Identifiable, Hashable, ObservableObject {
     
     var id: URL { url }
     
-    let filename: Filename
+    var filename: Filename {
+        willSet {
+            objectWillChange.send()
+        }
+    }
     let url: URL
     let `extension`: String
     let mediaInfo: MediaInfo

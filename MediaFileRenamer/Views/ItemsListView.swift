@@ -10,10 +10,10 @@ import SwiftUI
 
 struct ItemsListView: View {
     var sections: [ArtistSection]
-    @Binding var selectedObject: FileModel?
+    @Binding var selectedItems: Set<FileModel>
     
     var body: some View {
-        List(sections.sorted(by: { $0.id > $1.id }), selection: $selectedObject) { item in
+        List(sections.sorted(by: { $0.id > $1.id }), selection: $selectedItems) { item in
             VStack(alignment: .leading) {
                 Section(header: Text(item.id)
                     .font(.title)
@@ -22,7 +22,8 @@ struct ItemsListView: View {
                 ) {
                     VStack(alignment: .leading) {
                         ForEach(item.items) { song in
-                            MediaFileView(file: song)
+                            MediaFileView(file: song, selectedItems: self.$selectedItems)
+                            Spacer()
                         }
                     }
                 }

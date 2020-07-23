@@ -45,7 +45,11 @@ class ListViewModel: ObservableObject {
     }
     
     func preview(items: [FileModel]) {
-        
+        print(items)
+        items.forEach { file in
+            guard let title = file.mediaInfo.title else { return }
+            file.filename = .renaming(initial: file.initialFilename(), proposed: title)
+        }
     }
     
     private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileModel], Never> {

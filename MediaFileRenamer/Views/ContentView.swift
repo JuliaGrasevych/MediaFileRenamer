@@ -12,18 +12,18 @@ import Combine
 struct ContentView: View {
     @ObservedObject var viewModel: ListViewModel
     let notificationCenter = NotificationCenter.default
-    @State var selectedObject: FileModel?
+    @State var selectedItems = Set<FileModel>()
     
     var body: some View {
         NavigationView {
-            ItemsListView(sections: viewModel.sections, selectedObject: $selectedObject)
+            ItemsListView(sections: viewModel.sections, selectedItems: $selectedItems)
                 .onDrop(of: [ListViewModel.dropFileType], isTargeted: nil) { itemsProviders -> Bool in
                     return self.viewModel.handleDrop(itemsProviders: itemsProviders)
             }
             .onReceive(notificationCenter.publisher(for: .add)) { _ in self.handleMenuAdd() }
             
             Button(action: {
-                self.viewModel.preview(items: [])
+                self.viewModel.preview(items: Array(self.selectedItems))
             }) {
                 Text("Preview")
             }
