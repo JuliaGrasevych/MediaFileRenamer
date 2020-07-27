@@ -9,12 +9,9 @@
 import Foundation
 import AVFoundation
 
+typealias FileID = URL
+
 class FileModel: Identifiable, Hashable, ObservableObject {
-    enum Filename {
-        case initial(String)
-        case renaming(initial: String, proposed: String)
-    }
-    
     static func == (lhs: FileModel, rhs: FileModel) -> Bool {
         return lhs.id == rhs.id
     }
@@ -23,20 +20,20 @@ class FileModel: Identifiable, Hashable, ObservableObject {
         hasher.combine(id)
     }
     
-    var id: URL { url }
+    var id: FileID { url }
     
-    var filename: Filename {
-        willSet {
-            objectWillChange.send()
+    private(set) var filename: String
+    var url: URL {
+        didSet {
+            filename = url.lastPathComponent
         }
     }
-    let url: URL
     let `extension`: String
     let mediaInfo: MediaInfo
     
     init(url: URL) {
         self.url = url
-        self.filename = .initial(url.lastPathComponent)
+        self.filename = url.lastPathComponent
         self.extension = url.pathExtension
         self.mediaInfo = MediaInfo(fileUrl: self.url)
     }

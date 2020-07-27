@@ -12,7 +12,7 @@ import Combine
 struct ContentView: View {
     @ObservedObject var viewModel: ListViewModel
     let notificationCenter = NotificationCenter.default
-    @State var selectedItems = Set<FileModel>()
+    @State var selectedItems = Set<FileViewModel>()
     
     var body: some View {
         NavigationView {
@@ -22,11 +22,19 @@ struct ContentView: View {
             }
             .onReceive(notificationCenter.publisher(for: .add)) { _ in self.handleMenuAdd() }
             
-            Button(action: {
-                self.viewModel.preview(items: Array(self.selectedItems))
-            }) {
-                Text("Preview")
+            HStack {
+                Button(action: {
+                    self.viewModel.preview(items: Array(self.selectedItems.map(\.id)))
+                }) {
+                    Text("Rename")
+                }
+                Button(action: {
+                    self.viewModel.rename(items: Array(self.selectedItems.map(\.id)))
+                }) {
+                    Text("Ok")
+                }
             }
+            .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
     }

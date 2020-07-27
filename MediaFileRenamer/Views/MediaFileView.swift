@@ -9,8 +9,8 @@
 import SwiftUI
 
 struct MediaFileView: View {
-    @ObservedObject var file: FileModel
-    @Binding var selectedItems: Set<FileModel>
+    @ObservedObject var file: FileViewModel
+    @Binding var selectedItems: Set<FileViewModel>
     var isSelected: Bool {
         selectedItems.contains(file)
     }
@@ -18,8 +18,8 @@ struct MediaFileView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(file.mediaInfo.title ?? "No title".uppercased())
-            Text("Filename: \(file.initialFilename())")
-            file.proposedFilename().map { proposedFilename in
+            Text("Filename: \(file.initialFilename)")
+            file.proposedFilename.map { proposedFilename in
                 HStack {
                     Text("􀄵")
                     Text(proposedFilename)
@@ -39,18 +39,12 @@ struct MediaFileView: View {
     }
 }
 
-extension FileModel {
-    func initialFilename() -> String {
-        switch filename {
-        case let .initial(name): return name
-        case let .renaming(name, _): return name
-        }
+extension FileViewModel {
+    var initialFilename: String {
+        return file.filename
     }
     
-    func proposedFilename() -> String? {
-        switch filename {
-        case .initial: return nil
-        case let .renaming(_, name): return name
-        }
+    var mediaInfo: MediaInfo {
+        return file.mediaInfo
     }
 }

@@ -8,25 +8,24 @@
 
 import Foundation
 import Combine
-import AVFoundation
 
 class ListViewModel: ObservableObject {
     static let dropFileType = kUTTypeFileURL as String
     static let unknownArtistSection = "Unknown artist"
     
-    @Published private(set) var objects: Set<FileModel> = []
+    @Published private(set) var objects: Set<FileViewModel> = []
     private var dropCancellable: AnyCancellable?
     private var addCancellable: AnyCancellable?
     
     var sections: [ArtistSection] {
-        return Dictionary(grouping: objects, by: \.mediaInfo.artist)
+        return Dictionary(grouping: objects, by: \.file.mediaInfo.artist)
             .map { ArtistSection(id: $0.key ?? Self.unknownArtistSection, items: $0.value) }
     }
     
     func handleDrop(itemsProviders: [NSItemProvider]) -> Bool {
         if itemsProviders.isEmpty { return false }
         dropCancellable = FileDropHandler.handleDrop(itemsProviders: itemsProviders, fileType: Self.dropFileType)
-            .flatMap { urls -> AnyPublisher<[FileModel], Never> in
+            .flatMap { urls -> AnyPublisher<[FileViewModel], Never> in
                 self.fetchFiles(urls: urls)
             }
             .sink { files in
@@ -44,16 +43,39 @@ class ListViewModel: ObservableObject {
             })
     }
     
-    func preview(items: [FileModel]) {
+    func preview(items: [FileID]) {
         print(items)
-        items.forEach { file in
-            guard let title = file.mediaInfo.title else { return }
-            file.filename = .renaming(initial: file.initialFilename(), proposed: title)
+        
+        objects.forEach { object in
+            guard items.contains(object.id) else { return }
+            guard let title = object.mediaInfo.title as? NSString else { return }
+            object.proposedFilename = title.appendingPathExtension(object.file.extension)
         }
     }
     
-    private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileModel], Never> {
-        return Publishers.MergeMany(urls.map { FileFetcher.fetchFiles(at: $0) }).eraseToAnyPublisher()
+    func rename(items: [FileID]) {
+        objects.filter { items.contains($0.id) }
+            .forEach { file in
+                defer {
+                    file.proposedFilename = nil
+                }
+                
+                guard let proposedFilename = file.proposedFilename else { return }
+                do {
+                    try FileNameManager.rename(item: file.file, proposedFilename: proposedFilename)
+                } catch let error {
+                    file.error = error
+                }
+        }
+    }
+    
+    private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileViewModel], Never> {
+        return Publishers.MergeMany(
+            urls.map { FileFetcher.fetchFiles(at: $0)
+                .map { items in items.map(FileViewModel.init) }
+            }
+        )
+            .eraseToAnyPublisher()
     }
 }
 
@@ -79,46 +101,5 @@ final class FileDropHandler {
             }
         }
         return subject.receive(on: RunLoop.main).eraseToAnyPublisher()
-    }
-}
-
-final class FileFetcher {
-    private static let fileManager = FileManager.default
-    
-    static func fetchFiles(at url: URL) -> AnyPublisher<[FileModel], Never> {
-        var isDir: ObjCBool = false
-        guard fileManager.fileExists(atPath: url.relativePath, isDirectory: &isDir) else {
-            return Just([]).eraseToAnyPublisher()
-        }
-
-        guard isDir.boolValue else {
-            guard URL.supportedAudioTypes.contains(url.utType()) else { return Just([]).eraseToAnyPublisher() }
-            return Just([FileModel(url: url)]).eraseToAnyPublisher()
-        }
-        do {
-            let files = try fileManager.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: FileManager.DirectoryEnumerationOptions.skipsHiddenFiles)
-            
-            return Publishers.MergeMany(files.map { fetchFiles(at: $0) }).eraseToAnyPublisher()
-        } catch let exception {
-            debugPrint("[FileFetcher] \(exception)")
-            return Just([]).eraseToAnyPublisher()
-        }
-    }
-}
-
-extension URL {
-    static let supportedAudioTypes = [
-        kUTTypeMP3 as String,
-        kUTTypeMPEG4Audio as String,
-        kUTTypeAppleProtectedMPEG4Audio as String,
-        AVFileType.m4a.rawValue
-        ] as [String]
-    func utType() -> String {
-        let pathExtension = self.pathExtension
-        
-        if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, pathExtension as NSString, nil)?.takeRetainedValue() {
-            return uti as String
-        }
-        return kUTTypeData as String
     }
 }

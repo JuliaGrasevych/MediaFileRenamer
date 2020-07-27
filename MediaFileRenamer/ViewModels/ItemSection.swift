@@ -13,4 +13,4 @@ struct ItemSection<Item: Hashable>: Identifiable, Hashable {
     let items: [Item]
 }
 
-typealias ArtistSection = ItemSection<FileModel>
+typealias ArtistSection = ItemSection<FileViewModel>

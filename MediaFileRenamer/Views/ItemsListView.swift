@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ItemsListView: View {
     var sections: [ArtistSection]
-    @Binding var selectedItems: Set<FileModel>
+    @Binding var selectedItems: Set<FileViewModel>
     
     var body: some View {
         List(sections.sorted(by: { $0.id > $1.id }), selection: $selectedItems) { item in
