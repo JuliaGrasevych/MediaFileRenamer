@@ -11,7 +11,7 @@ import AVFoundation
 
 typealias FileID = URL
 
-class FileModel: Identifiable, Hashable, ObservableObject {
+struct FileModel: Identifiable, Hashable {
     static func == (lhs: FileModel, rhs: FileModel) -> Bool {
         return lhs.id == rhs.id
     }
@@ -99,4 +99,8 @@ extension AVMetadataItem {
         }
         return nil
     }
+}
+
+extension FileID {
+    var identityString: String { self.absoluteString }
 }

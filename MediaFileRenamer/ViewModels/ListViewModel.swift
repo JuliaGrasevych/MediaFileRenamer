@@ -13,7 +13,13 @@ class ListViewModel: ObservableObject {
     static let dropFileType = kUTTypeFileURL as String
     static let unknownArtistSection = "Unknown artist"
     
-    @Published private(set) var objects: Set<FileViewModel> = []
+    private var files: Set<FileModel> = [] {
+        didSet {
+            let newObj = files.map(FileViewModel.init)
+            objects.append(contentsOf: newObj.filter { obj in !self.objects.contains(where: { obj.fileId == $0.fileId }) })
+        }
+    }
+    @Published private(set) var objects: [FileViewModel] = []
     private var dropCancellable: AnyCancellable?
     private var addCancellable: AnyCancellable?
     
@@ -25,12 +31,12 @@ class ListViewModel: ObservableObject {
     func handleDrop(itemsProviders: [NSItemProvider]) -> Bool {
         if itemsProviders.isEmpty { return false }
         dropCancellable = FileDropHandler.handleDrop(itemsProviders: itemsProviders, fileType: Self.dropFileType)
-            .flatMap { urls -> AnyPublisher<[FileViewModel], Never> in
+            .flatMap { urls -> AnyPublisher<[FileModel], Never> in
                 self.fetchFiles(urls: urls)
             }
             .sink { files in
                 if files.isEmpty { return }
-                self.objects.formUnion(files)
+                self.files.formUnion(files)
         }
         return true
     }
@@ -39,41 +45,37 @@ class ListViewModel: ObservableObject {
         addCancellable = fetchFiles(urls: urls)
             .sink(receiveValue: { files in
                 if files.isEmpty { return }
-                self.objects.formUnion(files)
+                self.files.formUnion(files)
             })
     }
     
     func preview(items: [FileID]) {
         print(items)
         
-        objects.forEach { object in
-            guard items.contains(object.id) else { return }
-            guard let title = object.mediaInfo.title as? NSString else { return }
-            object.proposedFilename = title.appendingPathExtension(object.file.extension)
+        objects = objects.map { object -> FileViewModel in
+            guard items.contains(object.fileId) else { return object }
+            guard let title = object.mediaInfo.title as NSString? else { return object }
+            return FileViewModel(object.file, proposedFilename: title.appendingPathExtension(object.file.extension))
         }
     }
     
     func rename(items: [FileID]) {
-        objects.filter { items.contains($0.id) }
-            .forEach { file in
-                defer {
-                    file.proposedFilename = nil
-                }
-                
-                guard let proposedFilename = file.proposedFilename else { return }
+       objects = objects
+            .map { file -> FileViewModel in
+            guard items.contains(file.fileId) else { return file }
+                guard let proposedFilename = file.proposedFilename else { return file }
                 do {
-                    try FileNameManager.rename(item: file.file, proposedFilename: proposedFilename)
+                    let f = try FileNameManager.rename(item: file.file, proposedFilename: proposedFilename)
+                    return FileViewModel(f, proposedFilename: nil)
                 } catch let error {
-                    file.error = error
+                    return FileViewModel(file.file, proposedFilename: proposedFilename, error: .error(error.localizedDescription))
                 }
         }
     }
     
-    private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileViewModel], Never> {
+    private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileModel], Never> {
         return Publishers.MergeMany(
-            urls.map { FileFetcher.fetchFiles(at: $0)
-                .map { items in items.map(FileViewModel.init) }
-            }
+            urls.map { FileFetcher.fetchFiles(at: $0) }
         )
             .eraseToAnyPublisher()
     }

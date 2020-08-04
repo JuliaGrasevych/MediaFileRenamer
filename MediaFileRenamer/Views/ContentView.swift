@@ -12,7 +12,7 @@ import Combine
 struct ContentView: View {
     @ObservedObject var viewModel: ListViewModel
     let notificationCenter = NotificationCenter.default
-    @State var selectedItems = Set<FileViewModel>()
+    @State var selectedItems = Set<FileID>()
     
     var body: some View {
         NavigationView {
@@ -24,12 +24,12 @@ struct ContentView: View {
             
             HStack {
                 Button(action: {
-                    self.viewModel.preview(items: Array(self.selectedItems.map(\.id)))
+                    self.viewModel.preview(items: Array(self.selectedItems))
                 }) {
                     Text("Rename")
                 }
                 Button(action: {
-                    self.viewModel.rename(items: Array(self.selectedItems.map(\.id)))
+                    self.viewModel.rename(items: Array(self.selectedItems))
                 }) {
                     Text("Ok")
                 }

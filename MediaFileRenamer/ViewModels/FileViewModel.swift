@@ -8,18 +8,30 @@
 
 import Foundation
 
-final class FileViewModel: Identifiable, ObservableObject {
-    let file: FileModel
-    var proposedFilename: String? {
-        willSet {
-            objectWillChange.send()
+struct FileViewModel: Identifiable {
+    
+    enum ViewError: Hashable {
+        case error(String), noError
+        
+        var text: String? {
+            switch self {
+            case .error(let text): return text
+            case .noError: return nil
+            }
         }
     }
-    var error: Error?
     
-    var id: FileID { file.url }
+    let file: FileModel
+    var proposedFilename: String?
+    var error: ViewError
     
-    convenience init(_ file: FileModel, proposedFilename: String? = nil, error: Error? = nil) {
+    var fileId: FileID { file.url }
+    
+    var id: String {
+        fileId.identityString + (proposedFilename ?? "") + (error.text ?? "")
+    }
+    
+    init(_ file: FileModel, proposedFilename: String? = nil, error: ViewError = .noError) {
         self.init(file)
         self.proposedFilename = proposedFilename
         self.error = error
@@ -28,18 +40,22 @@ final class FileViewModel: Identifiable, ObservableObject {
     init(_ file: FileModel) {
         self.file = file
         self.proposedFilename = nil
-        self.error = nil
+        self.error = .noError
     }
 }
 
 extension FileViewModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(file)
+        hasher.combine(proposedFilename)
+        hasher.combine(error)
     }
 }
 
 extension FileViewModel: Equatable {
     static func == (lhs: FileViewModel, rhs: FileViewModel) -> Bool {
         return lhs.file == rhs.file
+            && lhs.proposedFilename == rhs.proposedFilename
+            && lhs.error == rhs.error
     }
 }

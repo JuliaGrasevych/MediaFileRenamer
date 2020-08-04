@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct MediaFileView: View {
-    @ObservedObject var file: FileViewModel
-    @Binding var selectedItems: Set<FileViewModel>
+    var file: FileViewModel
+    @Binding var selectedItems: Set<FileID>
     var isSelected: Bool {
-        selectedItems.contains(file)
+        selectedItems.contains(file.fileId)
     }
     
     var body: some View {
@@ -31,9 +31,9 @@ struct MediaFileView: View {
         .cornerRadius(6)
         .onTapGesture {
             if self.isSelected {
-                self.selectedItems.remove(self.file)
+                self.selectedItems.remove(self.file.fileId)
             } else {
-                self.selectedItems.insert(self.file)
+                self.selectedItems.insert(self.file.fileId)
             }
         }
     }

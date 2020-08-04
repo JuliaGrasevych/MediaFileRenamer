@@ -16,13 +16,14 @@ final class FileNameManager {
     
     private static let fileManager = FileManager.default
 
-    static func rename(item: FileModel, proposedFilename: String) throws {
+    static func rename(item: FileModel, proposedFilename: String) throws -> FileModel {
         let initialFilename = item.filename
         if initialFilename == proposedFilename { throw RenamingError.noNewFilename }
         let dirPath = item.url.deletingLastPathComponent()
         let filePath = dirPath.appendingPathComponent(proposedFilename)
         
         try fileManager.moveItem(at: item.url, to: filePath)
-        item.url = filePath
+        
+        return FileModel(url: filePath)
     }
 }
