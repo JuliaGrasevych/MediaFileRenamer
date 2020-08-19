@@ -22,6 +22,8 @@
 		A30393F224CF2F8600236756 /* FileFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30393F124CF2F8600236756 /* FileFetcher.swift */; };
 		A30393F424CF2FE000236756 /* FileNameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30393F324CF2FE000236756 /* FileNameManager.swift */; };
 		A30393F624CF358B00236756 /* FileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30393F524CF358B00236756 /* FileViewModel.swift */; };
+		A30393FD24DD939700236756 /* MediaTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30393FC24DD939700236756 /* MediaTokens.swift */; };
+		A303940024DD9BCA00236756 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30393FF24DD9BCA00236756 /* Collection+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +45,8 @@
 		A30393F124CF2F8600236756 /* FileFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileFetcher.swift; sourceTree = "<group>"; };
 		A30393F324CF2FE000236756 /* FileNameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNameManager.swift; sourceTree = "<group>"; };
 		A30393F524CF358B00236756 /* FileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileViewModel.swift; sourceTree = "<group>"; };
+		A30393FC24DD939700236756 /* MediaTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaTokens.swift; sourceTree = "<group>"; };
+		A30393FF24DD9BCA00236756 /* Collection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,7 @@
 		95147AE52461B29500461971 /* MediaFileRenamer */ = {
 			isa = PBXGroup;
 			children = (
+				A30393F724D9BB3800236756 /* Resources */,
 				A30393F024CF2F7500236756 /* Services */,
 				95AADC152464435800B99904 /* Models */,
 				95AADC18246443E900B99904 /* ViewModels */,
@@ -82,10 +87,7 @@
 				95147AE62461B29500461971 /* AppDelegate.swift */,
 				9503988C24C1E79B00478D4A /* MenuToolbarHandler.swift */,
 				9503988E24C1E8A700478D4A /* NotificationConstants.swift */,
-				95147AEA2461B29800461971 /* Assets.xcassets */,
-				95147AEF2461B29800461971 /* Main.storyboard */,
-				95147AF22461B29800461971 /* Info.plist */,
-				95147AF32461B29800461971 /* MediaFileRenamer.entitlements */,
+				A30393FE24DD9BBB00236756 /* Extensions */,
 				95147AEC2461B29800461971 /* Preview Content */,
 			);
 			path = MediaFileRenamer;
@@ -113,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				95AADC162464438600B99904 /* FileModel.swift */,
+				A30393FC24DD939700236756 /* MediaTokens.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -134,6 +137,25 @@
 				A30393F324CF2FE000236756 /* FileNameManager.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		A30393F724D9BB3800236756 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				95147AEA2461B29800461971 /* Assets.xcassets */,
+				95147AEF2461B29800461971 /* Main.storyboard */,
+				95147AF22461B29800461971 /* Info.plist */,
+				95147AF32461B29800461971 /* MediaFileRenamer.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A30393FE24DD9BBB00236756 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				A30393FF24DD9BCA00236756 /* Collection+Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,7 +230,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				95147AFB2461C7BF00461971 /* MediaFileView.swift in Sources */,
+				A30393FD24DD939700236756 /* MediaTokens.swift in Sources */,
 				9503988D24C1E79B00478D4A /* MenuToolbarHandler.swift in Sources */,
+				A303940024DD9BCA00236756 /* Collection+Extensions.swift in Sources */,
 				95147AE92461B29500461971 /* ContentView.swift in Sources */,
 				95AADC1C24646F3F00B99904 /* ListViewModel.swift in Sources */,
 				95AADC1A2464440300B99904 /* ItemSection.swift in Sources */,
@@ -358,7 +382,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"MediaFileRenamer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = MediaFileRenamer/Info.plist;
+				INFOPLIST_FILE = MediaFileRenamer/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -379,7 +403,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"MediaFileRenamer/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				INFOPLIST_FILE = MediaFileRenamer/Info.plist;
+				INFOPLIST_FILE = MediaFileRenamer/Resources/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

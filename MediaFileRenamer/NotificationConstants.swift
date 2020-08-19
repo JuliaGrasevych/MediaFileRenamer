@@ -10,4 +10,6 @@ import Foundation
 
 extension Notification.Name {
     static let add = Notification.Name("com.mediafilerenamer.add")
+    static let delete = Notification.Name("com.mediafilerenamer.delete")
+    static let selectAll = Notification.Name("com.mediafilerenamer.selectAll")
 }

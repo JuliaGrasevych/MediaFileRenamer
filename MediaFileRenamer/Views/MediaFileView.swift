@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct MediaFileView: View {
-    var file: FileViewModel
+    let file: FileViewModel
     @Binding var selectedItems: Set<FileID>
     var isSelected: Bool {
         selectedItems.contains(file.fileId)

@@ -37,4 +37,12 @@ extension AppDelegate {
     @IBAction func add(_ sender: NSMenuItem) {
         MenuToolbarHandler.add()
     }
+    
+    @IBAction func delete(_ sender: NSMenuItem) {
+        MenuToolbarHandler.delete()
+    }
+    
+    @IBAction func selectAll(_ sender: NSMenuItem) {
+        MenuToolbarHandler.selectAll()
+    }
 }

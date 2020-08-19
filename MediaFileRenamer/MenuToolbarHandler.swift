@@ -13,4 +13,12 @@ final class MenuToolbarHandler {
     static func add() {
         notificationCenter.post(name: .add, object: nil)
     }
+    
+    static func delete() {
+        notificationCenter.post(name: .delete, object: nil)
+    }
+    
+    static func selectAll() {
+        notificationCenter.post(name: .selectAll, object: nil)
+    }
 }

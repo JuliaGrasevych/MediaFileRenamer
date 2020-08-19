@@ -15,8 +15,10 @@ class ListViewModel: ObservableObject {
     
     private var files: Set<FileModel> = [] {
         didSet {
-            let newObj = files.map(FileViewModel.init)
-            objects.append(contentsOf: newObj.filter { obj in !self.objects.contains(where: { obj.fileId == $0.fileId }) })
+            let newFiles = files.filter { !oldValue.contains($0) }.map(FileViewModel.init)
+            var remainingObjects = objects.filter { file in files.contains(where: { file.fileId == $0.id }) }
+            remainingObjects.append(contentsOf: newFiles)
+            objects = remainingObjects
         }
     }
     @Published private(set) var objects: [FileViewModel] = []
@@ -65,12 +67,16 @@ class ListViewModel: ObservableObject {
             guard items.contains(file.fileId) else { return file }
                 guard let proposedFilename = file.proposedFilename else { return file }
                 do {
-                    let f = try FileNameManager.rename(item: file.file, proposedFilename: proposedFilename)
-                    return FileViewModel(f, proposedFilename: nil)
+                    let renamedFile = try FileNameManager.rename(item: file.file, proposedFilename: proposedFilename)
+                    return FileViewModel(renamedFile, proposedFilename: nil)
                 } catch let error {
                     return FileViewModel(file.file, proposedFilename: proposedFilename, error: .error(error.localizedDescription))
                 }
         }
+    }
+    
+    func delete(items: [FileID]) {
+        files.subtract(files.filter { file in items.contains(where: { $0 == file.id }) })
     }
     
     private func fetchFiles(urls: [URL]) -> AnyPublisher<[FileModel], Never> {
